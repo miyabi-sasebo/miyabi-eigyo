@@ -1,5 +1,5 @@
 /* 営業記録アプリ：電波がなくても開けるように、画面のファイルをiPhoneに保存しておく */
-const CACHE = "miyabi-mobile-v1.0.0";
+const CACHE = "miyabi-mobile-v2.0.0";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-512.png"];
 
 self.addEventListener("install", e => {

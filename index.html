@@ -24,21 +24,37 @@ nav button.on{color:var(--main);font-weight:700;border-bottom-color:var(--main)}
 nav .badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:#fff;font-size:12px;margin-left:4px}
 main{padding:14px 16px calc(env(safe-area-inset-bottom) + 30px);max-width:640px;margin:0 auto}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
-label{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
-label:first-child{margin-top:0}
+label,.lb{display:block;font-size:13px;color:var(--sub);margin:12px 0 5px}
+.card>label:first-child,.card>.lb:first-child{margin-top:0}
 input,select,textarea{width:100%;font-size:16px;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-family:inherit}
 textarea{min-height:90px;resize:vertical}
 .row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
-.btn{display:block;width:100%;border:0;border-radius:10px;padding:14px;font-size:16px;font-weight:700;background:var(--main);color:#fff;margin-top:14px}
+.btn{display:block;width:100%;border:0;border-radius:10px;padding:14px;font-size:16px;font-weight:700;background:var(--main);color:#fff;margin-top:14px;text-align:center}
 .btn.sub{background:#e8eef5;color:var(--main)}
 .btn.accent{background:var(--accent)}
 .btn.small{display:inline-block;width:auto;padding:8px 12px;font-size:14px;margin:0}
 .btn.danger{background:#fdecec;color:var(--ng)}
 .btn:disabled{opacity:.5}
+.seg{display:flex;background:#e8eef5;border-radius:10px;padding:3px}
+.seg button{flex:1;border:0;background:none;padding:9px;font-size:15px;border-radius:8px;color:var(--main)}
+.seg button.on{background:#fff;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:8px 14px;font-size:15px;color:var(--ink)}
 .chips button.on{background:var(--main);border-color:var(--main);color:#fff}
+.chips button.edit{border-style:dashed;color:var(--sub)}
+.picklist{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:9px;margin-top:8px}
+.picklist button{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:#fff;padding:11px 12px;font-size:15px;color:var(--ink)}
+.picklist button:first-child{border-top:0}
+.picklist .a{font-size:12px;color:var(--sub);display:block;margin-top:2px}
+.picked{display:flex;align-items:center;gap:10px;background:#eef4fb;border:1px solid #c9dbef;border-radius:9px;padding:10px 12px;margin-top:8px}
+.picked div{flex:1;min-width:0}.picked b{display:block}.picked span{font-size:12px;color:var(--sub)}
 .pos{font-size:13px;color:var(--sub);margin-top:6px}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.thumb{position:relative;width:76px;height:76px;border-radius:8px;overflow:hidden;background:#e8eef5;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--sub);text-align:center;padding:4px}
+.thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.thumb button{position:absolute;top:2px;right:2px;width:24px;height:24px;border-radius:12px;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:24px;padding:0}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;font-size:100px}
 .item{border-top:1px solid var(--line);padding:12px 0}
 .item:first-child{border-top:0;padding-top:0}
 .item b{font-size:16px}
@@ -47,16 +63,20 @@ textarea{min-height:90px;resize:vertical}
 .tag.res{background:#e8eef5;color:var(--main)}
 .tag.unsent{background:#fff1e0;color:var(--warn)}
 .tag.sent{background:#e6f4e7;color:var(--ok)}
+.tag.new{background:#f3e8ff;color:#6b3fa0}
 .acts{margin-top:8px;display:flex;gap:8px}
 .note{font-size:14px;color:var(--sub);line-height:1.6}
 .note b{color:var(--ink)}
 .banner{background:#fff8e1;border:1px solid #f0d58a;border-radius:10px;padding:12px;font-size:14px;line-height:1.6;margin-bottom:12px}
 .big{font-size:34px;font-weight:800;letter-spacing:4px;text-align:center;color:var(--main);margin:8px 0}
-.empty{color:var(--sub);text-align:center;padding:20px 0;font-size:14px}
+.empty{color:var(--sub);text-align:center;padding:16px 0;font-size:14px}
+.optrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.optrow:first-child{border-top:0}
+.optrow span{flex:1}
+.optrow button{border:0;background:#e8eef5;color:var(--main);border-radius:8px;padding:6px 10px;font-size:14px}
+.optrow button.del{background:#fdecec;color:var(--ng)}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translateX(-50%);background:#1d2733;color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;max-width:90%}
 .toast.on{opacity:.95}.toast.err{background:var(--ng)}
-dialog{border:0;border-radius:14px;padding:18px;max-width:420px;width:calc(100% - 32px)}
-dialog::backdrop{background:rgba(0,0,0,.4)}
 .hidden{display:none!important}
 </style>
 </head>
@@ -80,19 +100,39 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
         <div><label for="f-date">訪問日</label><input type="date" id="f-date"></div>
         <div><label for="f-time">時刻</label><input type="time" id="f-time"></div>
       </div>
-      <label for="f-name">訪問先（会社名・お名前）</label>
-      <input id="f-name" list="nameList" autocomplete="off" placeholder="例：〇〇建設 △△様">
-      <datalist id="nameList"></datalist>
-      <label>結果</label>
+
+      <div class="lb">訪問先</div>
+      <div class="seg" id="custMode">
+        <button type="button" data-m="exist" class="on">既存のお客様</button>
+        <button type="button" data-m="new">新規のお客様</button>
+      </div>
+      <div id="mode-exist">
+        <div id="pickedBox" class="picked hidden"><div><b id="pickedName"></b><span id="pickedAddr"></span></div><button class="btn small sub" type="button" id="unpick">変更</button></div>
+        <div id="pickArea">
+          <input id="custSearch" placeholder="会社名・お名前で探す" autocomplete="off" style="margin-top:8px">
+          <div class="picklist" id="custList"></div>
+        </div>
+      </div>
+      <div id="mode-new" class="hidden">
+        <input id="f-newname" placeholder="会社名・お名前（例：〇〇建設 △△様）" autocomplete="off" style="margin-top:8px">
+        <input id="f-newaddr" placeholder="住所（任意）" autocomplete="off" style="margin-top:8px">
+        <div class="note" style="margin-top:6px">送信すると、営業マップのお客様一覧にも追加されます。</div>
+      </div>
+
+      <div class="lb">結果</div>
       <div class="chips" id="f-result"></div>
+
       <label for="f-memo">内容・メモ</label>
       <textarea id="f-memo" placeholder="話した内容、要望、金額の目安など"></textarea>
       <div class="row">
         <div><label for="f-next">次にやること</label><input id="f-next" placeholder="見積を送る など"></div>
         <div><label for="f-nextdate">期限</label><input type="date" id="f-nextdate"></div>
       </div>
-      <label for="f-address">場所・住所（任意）</label>
-      <input id="f-address" placeholder="佐世保市〇〇町">
+
+      <div class="lb">写真・ファイル</div>
+      <div class="thumbs" id="thumbs"></div>
+      <label class="btn sub filebtn" style="margin-top:8px">📷 写真・ファイルを追加<input type="file" id="fileIn" accept="image/*,application/pdf" multiple></label>
+
       <button class="btn sub" id="gpsBtn" type="button">📍 現在地を記録</button>
       <div class="pos" id="f-pos">位置：未記録</div>
       <button class="btn accent" id="saveBtn" type="button">保存する（iPhoneに保存）</button>
@@ -108,16 +148,6 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
   <!-- 会社へ送信 -->
   <section id="tab-send" class="hidden">
-    <div class="card">
-      <div class="note" id="sendInfo"></div>
-      <ol class="note" style="padding-left:20px;margin:10px 0 0">
-        <li>iPhoneを<b>会社のWi-Fi</b>につなぐ</li>
-        <li>下の「送信する」を押す</li>
-        <li>開いた画面に「受け取りました」と<b>4けたの番号</b>が出たら、左上の「完了」で閉じる</li>
-        <li>この画面に戻り、番号が同じなら「送信できた」を押す</li>
-      </ol>
-      <button class="btn accent" id="sendBtn" type="button">送信する</button>
-    </div>
     <div class="card hidden" id="confirmBox">
       <div class="note">送信した画面に出た番号は、これと同じでしたか？</div>
       <div class="big" id="confirmCode"></div>
@@ -127,7 +157,21 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       </div>
     </div>
     <div class="card">
-      <div class="note"><b>万一のための控え</b><br>iPhoneの機種変更の前などに、記録をファイルで保存できます。</div>
+      <div class="note" id="sendInfo"></div>
+      <ol class="note" style="padding-left:20px;margin:10px 0 0">
+        <li>iPhoneを<b>会社のWi-Fi</b>につなぐ</li>
+        <li>下の「送信する」を押す</li>
+        <li>「受け取りました」と<b>4けたの番号</b>が出たら、「顧客リストをコピー」を押してから、左上の「完了」で閉じる</li>
+        <li>この画面で番号が同じなら「送信できた」を押す</li>
+      </ol>
+      <button class="btn accent" id="sendBtn" type="button">送信する</button>
+    </div>
+    <div class="card">
+      <div class="note"><b>会社の顧客リスト</b>（<span id="custInfo"></span>）<br>送信後の画面で「顧客リストをコピー」を押したあと、ここを押すと「既存のお客様」に出るようになります。</div>
+      <button class="btn sub" id="pasteCust" type="button">コピーした顧客リストを取り込む</button>
+    </div>
+    <div class="card">
+      <div class="note"><b>万一のための控え</b><br>iPhoneの機種変更の前などに、記録をファイルで保存できます（写真は含みません）。</div>
       <button class="btn sub" id="exportBtn" type="button">記録をファイルに書き出す</button>
     </div>
   </section>
@@ -141,9 +185,18 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <input id="s-host" inputmode="url" autocapitalize="off" autocorrect="off" placeholder="192.168.11.56">
       <button class="btn" id="saveSet" type="button">設定を保存</button>
     </div>
+    <div class="card" id="resultCard">
+      <div class="lb" style="margin-top:0">「結果」の選択肢</div>
+      <div id="resultOpts"></div>
+      <div class="row" style="margin-top:10px">
+        <input id="newResult" placeholder="追加する選択肢（例：見積提出）">
+        <button class="btn small" id="addResult" type="button" style="flex:0 0 auto">追加</button>
+      </div>
+      <button class="btn sub" id="resetResult" type="button">最初の選択肢に戻す</button>
+    </div>
     <div class="card">
       <div class="note">送信済みの記録は、iPhoneの中に残しておけます。容量が気になるときだけ消してください。</div>
-      <button class="btn danger" id="purgeSent" type="button">送信済みの記録をiPhoneから消す</button>
+      <button class="btn danger" id="purgeSent" type="button">送信済みの記録と写真をiPhoneから消す</button>
     </div>
     <p class="note" id="ver"></p>
   </section>
@@ -152,13 +205,17 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
 <script>
 "use strict";
-const VERSION = "1.0.0";
-const K_REC = "miyabi_mobile_visits_v1";   // 記録
-const K_SET = "miyabi_mobile_settings_v1"; // 設定
-const K_PEND = "miyabi_mobile_pending_v1"; // 送信確認待ち
-const RESULTS = ["商談", "フォロー", "名刺交換", "不在", "失注", "受注"];
-const MAX_PER_SEND = 40;        // 1回に送る件数
-const MAX_URL_CHARS = 60000;    // 1回に送るデータの大きさの上限
+const VERSION = "2.0.0";
+const K_REC = "miyabi_mobile_visits_v1";    // 記録
+const K_SET = "miyabi_mobile_settings_v1";  // 設定
+const K_PEND = "miyabi_mobile_pending_v1";  // 送信確認待ち
+const K_CUST = "miyabi_mobile_customers_v1"; // 会社の顧客リスト
+const K_RES = "miyabi_mobile_results_v1";   // 結果の選択肢
+const DEFAULT_RESULTS = ["商談", "フォロー", "名刺交換", "見積提出", "不在", "失注", "受注"];
+const MAX_PER_SEND = 40;                 // 1回に送る記録の件数
+const MAX_SEND_BYTES = 18 * 1024 * 1024; // 1回に送るデータの大きさの目安（写真込み）
+const PHOTO_MAX_PX = 1600;               // 写真の長い辺（これより大きい写真は縮める）
+const FILE_MAX_BYTES = 10 * 1024 * 1024; // PDFなど1ファイルの上限
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -167,13 +224,50 @@ function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return t
 function pad(n) { return String(n).padStart(2, "0"); }
 function today() { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
 function nowTime() { const d = new Date(); return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
-function uid() { return "m-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function uid(p) { return (p || "m-") + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 let toastTimer = null;
-function toast(m, err) { const t = $("#toast"); t.textContent = m; t.className = "toast on" + (err ? " err" : ""); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = "toast", err ? 3500 : 2000); }
+function toast(m, err) { const t = $("#toast"); t.textContent = m; t.className = "toast on" + (err ? " err" : ""); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = "toast", err ? 3500 : 2200); }
 
 const settings = () => Object.assign({ name: "", host: "192.168.11.56" }, load(K_SET, {}));
 const records = () => load(K_REC, []);
-let curPos = null, curResult = RESULTS[0];
+const results = () => { const r = load(K_RES, null); return Array.isArray(r) && r.length ? r : DEFAULT_RESULTS.slice(); };
+
+/* ---------- 写真・ファイルの保存（IndexedDB） ---------- */
+let dbp = null;
+function db() {
+  if (!dbp) dbp = new Promise((ok, ng) => {
+    const r = indexedDB.open("miyabi-mobile", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("files", { keyPath: "id" });
+    r.onsuccess = () => ok(r.result); r.onerror = () => ng(r.error);
+  });
+  return dbp;
+}
+async function fileTx(mode, fn) {
+  const d = await db();
+  return new Promise((ok, ng) => {
+    const tx = d.transaction("files", mode), st = tx.objectStore("files");
+    let out; const r = fn(st); if (r) r.onsuccess = () => { out = r.result; };
+    tx.oncomplete = () => ok(out); tx.onerror = () => ng(tx.error); tx.onabort = () => ng(tx.error);
+  });
+}
+const putFile = f => fileTx("readwrite", st => st.put(f));
+const getFile = id => fileTx("readonly", st => st.get(id));
+const delFile = id => fileTx("readwrite", st => st.delete(id));
+
+function shrinkImage(file) {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight; const s = Math.min(1, PHOTO_MAX_PX / Math.max(w, h));
+      w = Math.round(w * s); h = Math.round(h * s);
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      c.getContext("2d").drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url);
+      c.toBlob(b => resolve(b || file), "image/jpeg", 0.8);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
 
 /* ---------- 画面切り替え ---------- */
 function showTab(name) {
@@ -192,19 +286,113 @@ function refreshHeader() {
   $("#needName").classList.toggle("hidden", !!s.name);
   const n = records().filter(r => !r.sentAt).length;
   $("#unsentN").textContent = n; $("#unsentN").classList.toggle("hidden", !n);
-  const names = Array.from(new Set(records().map(r => r.name).filter(Boolean))).slice(0, 200);
-  $("#nameList").innerHTML = names.map(n => '<option value="' + esc(n) + '">').join("");
 }
 
-/* ---------- 記録する ---------- */
-function renderChips() {
-  $("#f-result").innerHTML = RESULTS.map(r => '<button type="button" class="' + (r === curResult ? "on" : "") + '" data-r="' + esc(r) + '">' + esc(r) + '</button>').join("");
-  $("#f-result").querySelectorAll("button").forEach(b => b.onclick = () => { curResult = b.dataset.r; renderChips(); });
+/* ---------- 訪問先（既存／新規） ---------- */
+let custMode = "exist", picked = null; // picked = {id, name, address}
+function customerChoices() {
+  // 会社の顧客リスト ＋ このiPhoneで記録した訪問先（重複は名前でまとめる）
+  const map = new Map();
+  load(K_CUST, []).forEach(c => { if (c && c.name) map.set(c.name.trim(), { id: c.id || "", name: c.name.trim(), address: c.address || "" }); });
+  records().forEach(r => { const n = (r.name || "").trim(); if (n && !map.has(n)) map.set(n, { id: r.custId || "", name: n, address: r.address || "" }); });
+  return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name, "ja"));
 }
+function setMode(m) {
+  custMode = m;
+  document.querySelectorAll("#custMode button").forEach(b => b.classList.toggle("on", b.dataset.m === m));
+  $("#mode-exist").classList.toggle("hidden", m !== "exist");
+  $("#mode-new").classList.toggle("hidden", m !== "new");
+  if (m === "exist") renderCustList();
+}
+document.querySelectorAll("#custMode button").forEach(b => b.onclick = () => setMode(b.dataset.m));
+function renderCustList() {
+  $("#pickedBox").classList.toggle("hidden", !picked);
+  $("#pickArea").classList.toggle("hidden", !!picked);
+  if (picked) { $("#pickedName").textContent = picked.name; $("#pickedAddr").textContent = picked.address || ""; return; }
+  const q = $("#custSearch").value.trim().toLowerCase();
+  const all = customerChoices();
+  const hit = all.filter(c => !q || c.name.toLowerCase().includes(q) || (c.address || "").toLowerCase().includes(q)).slice(0, 100);
+  if (!all.length) { $("#custList").innerHTML = '<div class="empty">まだ顧客リストがありません。<br>「新規のお客様」で入力するか、「会社へ送信」から顧客リストを取り込んでください。</div>'; return; }
+  if (!hit.length) { $("#custList").innerHTML = '<div class="empty">見つかりません。「新規のお客様」で入力してください。</div>'; return; }
+  $("#custList").innerHTML = hit.map((c, i) => '<button type="button" data-i="' + i + '">' + esc(c.name) + (c.address ? '<span class="a">' + esc(c.address) + '</span>' : '') + '</button>').join("");
+  $("#custList").querySelectorAll("button").forEach(b => b.onclick = () => { picked = hit[+b.dataset.i]; renderCustList(); });
+}
+$("#custSearch").oninput = renderCustList;
+$("#unpick").onclick = () => { picked = null; $("#custSearch").value = ""; renderCustList(); setTimeout(() => $("#custSearch").focus(), 50); };
+
+/* ---------- 結果 ---------- */
+let curResult = "";
+function renderChips() {
+  const list = results();
+  if (curResult && !list.includes(curResult)) list.push(curResult); // 前に使った選択肢が消えていても選べるように
+  $("#f-result").innerHTML = list.map(r => '<button type="button" class="' + (r === curResult ? "on" : "") + '" data-r="' + esc(r) + '">' + esc(r) + '</button>').join("")
+    + '<button type="button" class="edit" id="editResults">✏️ 選択肢を編集</button>';
+  $("#f-result").querySelectorAll("[data-r]").forEach(b => b.onclick = () => { curResult = b.dataset.r; renderChips(); });
+  $("#editResults").onclick = () => { showTab("set"); setTimeout(() => $("#resultCard").scrollIntoView({ behavior: "smooth" }), 50); };
+}
+function renderResultOpts() {
+  const list = results();
+  $("#resultOpts").innerHTML = list.map((r, i) => '<div class="optrow"><span>' + esc(r) + '</span>'
+    + (i > 0 ? '<button type="button" data-up="' + i + '">↑</button>' : '')
+    + '<button type="button" data-ren="' + i + '">名前変更</button><button type="button" class="del" data-del="' + i + '">削除</button></div>').join("");
+  $("#resultOpts").querySelectorAll("[data-up]").forEach(b => b.onclick = () => { const l = results(), i = +b.dataset.up; [l[i - 1], l[i]] = [l[i], l[i - 1]]; save(K_RES, l); renderResultOpts(); renderChips(); });
+  $("#resultOpts").querySelectorAll("[data-ren]").forEach(b => b.onclick = () => {
+    const l = results(), i = +b.dataset.ren; const v = (prompt("新しい名前", l[i]) || "").trim();
+    if (!v || l.includes(v)) return; if (curResult === l[i]) curResult = v; l[i] = v; save(K_RES, l); renderResultOpts(); renderChips();
+  });
+  $("#resultOpts").querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+    const l = results(); if (l.length <= 1) { toast("1つは残してください", true); return; }
+    const i = +b.dataset.del; if (!confirm("「" + l[i] + "」を選択肢から消しますか？（記録済みの内容はそのままです）")) return;
+    l.splice(i, 1); save(K_RES, l); if (!l.includes(curResult)) curResult = l[0]; renderResultOpts(); renderChips();
+  });
+}
+$("#addResult").onclick = () => {
+  const v = $("#newResult").value.trim(); if (!v) return;
+  const l = results(); if (l.includes(v)) { toast("同じ選択肢があります", true); return; }
+  l.push(v); save(K_RES, l); $("#newResult").value = ""; renderResultOpts(); renderChips(); toast("追加しました");
+};
+$("#resetResult").onclick = () => { if (!confirm("選択肢を最初の状態に戻しますか？")) return; localStorage.removeItem(K_RES); renderResultOpts(); renderChips(); };
+
+/* ---------- 写真・ファイル（入力中） ---------- */
+let curFiles = []; // [{id, name, type, size, thumb}]
+const objUrls = [];
+function renderThumbs() {
+  objUrls.splice(0).forEach(u => URL.revokeObjectURL(u));
+  $("#thumbs").innerHTML = curFiles.map((f, i) => '<div class="thumb" data-i="' + i + '">' + (f.type.startsWith("image/") ? '' : '📄<br>' + esc(f.name)) + '<button type="button" data-rm="' + i + '">×</button></div>').join("");
+  curFiles.forEach(async (f, i) => {
+    if (!f.type.startsWith("image/")) return;
+    const rec = await getFile(f.id); if (!rec) return;
+    const u = URL.createObjectURL(rec.blob); objUrls.push(u);
+    const box = $('#thumbs .thumb[data-i="' + i + '"]'); if (box) box.insertAdjacentHTML("afterbegin", '<img src="' + u + '" alt="">');
+  });
+  $("#thumbs").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { curFiles.splice(+b.dataset.rm, 1); renderThumbs(); });
+}
+$("#fileIn").onchange = async e => {
+  const files = Array.from(e.target.files || []); e.target.value = "";
+  for (const f of files) {
+    try {
+      let blob = f, type = f.type || "application/octet-stream", name = f.name || "file";
+      if (type.startsWith("image/")) {
+        const small = await shrinkImage(f);
+        if (!small) { toast("この画像は読み込めませんでした：" + name, true); continue; }
+        blob = small; type = "image/jpeg"; name = name.replace(/\.[^.]+$/, "") + ".jpg";
+      } else if (type !== "application/pdf") { toast("写真かPDFを選んでください", true); continue; }
+      if (blob.size > FILE_MAX_BYTES) { toast("ファイルが大きすぎます（10MBまで）：" + name, true); continue; }
+      const id = uid("f-");
+      await putFile({ id, blob, name, type, size: blob.size });
+      curFiles.push({ id, name, type, size: blob.size });
+    } catch (err) { toast("追加できませんでした（容量不足の可能性）", true); }
+  }
+  renderThumbs();
+};
+
+/* ---------- 記録する ---------- */
+let curPos = null;
 function clearForm() {
   $("#f-id").value = ""; $("#f-date").value = today(); $("#f-time").value = nowTime();
-  ["#f-name", "#f-memo", "#f-next", "#f-nextdate", "#f-address"].forEach(s => $(s).value = "");
-  curResult = RESULTS[0]; curPos = null; renderChips(); showPos();
+  ["#f-memo", "#f-next", "#f-nextdate", "#f-newname", "#f-newaddr", "#custSearch"].forEach(s => $(s).value = "");
+  picked = null; curResult = results()[0]; curPos = null; curFiles = [];
+  setMode("exist"); renderChips(); renderThumbs(); showPos();
   $("#saveBtn").textContent = "保存する（iPhoneに保存）"; $("#cancelEdit").classList.add("hidden");
 }
 function showPos() { $("#f-pos").textContent = curPos ? "位置：記録済み（" + curPos.lat.toFixed(5) + ", " + curPos.lng.toFixed(5) + "）" : "位置：未記録"; }
@@ -216,10 +404,16 @@ $("#gpsBtn").onclick = () => {
     () => { showPos(); toast("位置を取れませんでした（設定で位置情報を許可してください）", true); },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
 };
-$("#saveBtn").onclick = () => {
+$("#saveBtn").onclick = async () => {
   const s = settings();
-  const name = $("#f-name").value.trim();
-  if (!name) { toast("訪問先を入れてください", true); $("#f-name").focus(); return; }
+  let name, address, custId = "", custNew = false;
+  if (custMode === "exist") {
+    if (!picked) { toast("訪問先を選んでください（無いときは「新規のお客様」）", true); return; }
+    name = picked.name; address = picked.address || ""; custId = picked.id || "";
+  } else {
+    name = $("#f-newname").value.trim(); address = $("#f-newaddr").value.trim(); custNew = true;
+    if (!name) { toast("訪問先の名前を入れてください", true); $("#f-newname").focus(); return; }
+  }
   const list = records();
   const id = $("#f-id").value;
   const old = id ? list.find(r => r.id === id) : null;
@@ -227,12 +421,12 @@ $("#saveBtn").onclick = () => {
     id: id || uid(),
     date: $("#f-date").value || today(),
     time: $("#f-time").value || "",
-    name,
+    name, address, custId, custNew,
     result: curResult,
     memo: $("#f-memo").value.trim(),
     next: $("#f-next").value.trim(),
     nextDate: $("#f-nextdate").value,
-    address: $("#f-address").value.trim(),
+    attachments: curFiles.map(f => ({ id: f.id, name: f.name, type: f.type, size: f.size })),
     lat: curPos ? curPos.lat : (old ? old.lat : null),
     lng: curPos ? curPos.lng : (old ? old.lng : null),
     by: s.name || "",
@@ -241,6 +435,11 @@ $("#saveBtn").onclick = () => {
     updatedAt: new Date().toISOString(),
     sentAt: null   // 直したら、もう一度送る
   };
+  // 編集で外した写真は消す
+  if (old && Array.isArray(old.attachments)) {
+    const keep = new Set(rec.attachments.map(a => a.id));
+    for (const a of old.attachments) if (!keep.has(a.id)) { try { await delFile(a.id); } catch (e) {} }
+  }
   if (old) list[list.indexOf(old)] = rec; else list.unshift(rec);
   list.sort((a, b) => (b.date + (b.time || "")).localeCompare(a.date + (a.time || "")));
   if (!save(K_REC, list)) return;
@@ -253,9 +452,11 @@ function editRecord(id) {
   const r = records().find(x => x.id === id); if (!r) return;
   showTab("add");
   $("#f-id").value = r.id; $("#f-date").value = r.date || ""; $("#f-time").value = r.time || "";
-  $("#f-name").value = r.name || ""; $("#f-memo").value = r.memo || ""; $("#f-next").value = r.next || "";
-  $("#f-nextdate").value = r.nextDate || ""; $("#f-address").value = r.address || "";
-  curResult = RESULTS.includes(r.result) ? r.result : RESULTS[0]; renderChips();
+  $("#f-memo").value = r.memo || ""; $("#f-next").value = r.next || ""; $("#f-nextdate").value = r.nextDate || "";
+  if (r.custNew) { setMode("new"); $("#f-newname").value = r.name || ""; $("#f-newaddr").value = r.address || ""; picked = null; }
+  else { picked = { id: r.custId || "", name: r.name || "", address: r.address || "" }; setMode("exist"); }
+  curResult = r.result || results()[0]; renderChips();
+  curFiles = (r.attachments || []).map(a => Object.assign({}, a)); renderThumbs();
   curPos = r.lat != null ? { lat: r.lat, lng: r.lng } : null; showPos();
   $("#saveBtn").textContent = "直して保存"; $("#cancelEdit").classList.remove("hidden");
 }
@@ -265,82 +466,115 @@ function renderList() {
   const list = records();
   if (!list.length) { $("#list").innerHTML = '<div class="empty">まだ記録がありません</div>'; return; }
   $("#list").innerHTML = list.map(r =>
-    '<div class="item"><b>' + esc(r.name) + '</b><span class="tag res">' + esc(r.result) + '</span>'
+    '<div class="item"><b>' + esc(r.name) + '</b>' + (r.custNew ? '<span class="tag new">新規</span>' : '') + '<span class="tag res">' + esc(r.result) + '</span>'
     + (r.sentAt ? '<span class="tag sent">送信済み</span>' : '<span class="tag unsent">未送信</span>')
-    + '<div class="m">' + esc(r.date) + (r.time ? " " + esc(r.time) : "") + (r.address ? "　" + esc(r.address) : "") + (r.lat != null ? "　📍" : "") + '</div>'
+    + '<div class="m">' + esc(r.date) + (r.time ? " " + esc(r.time) : "") + (r.address ? "　" + esc(r.address) : "") + (r.lat != null ? "　📍" : "") + ((r.attachments || []).length ? "　📎" + r.attachments.length : "") + '</div>'
     + (r.memo ? '<div class="m">' + esc(r.memo) + '</div>' : '')
     + (r.next ? '<div class="m">次：' + esc(r.next) + (r.nextDate ? "（" + esc(r.nextDate) + "まで）" : "") + '</div>' : '')
     + '<div class="acts"><button class="btn small sub" data-edit="' + esc(r.id) + '">直す</button>'
     + '<button class="btn small danger" data-del="' + esc(r.id) + '">消す</button></div></div>').join("");
   $("#list").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => editRecord(b.dataset.edit));
-  $("#list").querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+  $("#list").querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
     const r = records().find(x => x.id === b.dataset.del); if (!r) return;
     const msg = r.sentAt ? "この記録をiPhoneから消しますか？（会社に送った分は残ります）" : "まだ会社に送っていない記録です。本当に消しますか？";
     if (!confirm(msg)) return;
+    for (const a of (r.attachments || [])) { try { await delFile(a.id); } catch (e) {} }
     save(K_REC, records().filter(x => x.id !== r.id)); renderList(); refreshHeader(); toast("消しました");
   });
 }
 
 /* ---------- 会社へ送信 ---------- */
-// 送る記録のまとまりから4けたの確認番号を作る（受け取り側も同じ計算をする）
+// 送る記録のまとまりから4けたの確認番号を作る（会社側も同じ計算をする）
 function codeOf(ids) {
   let h = 0; const s = ids.slice().sort().join(",");
   for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; }
   return String(h % 10000).padStart(4, "0");
 }
-function b64url(str) {
-  const bytes = new TextEncoder().encode(str); let bin = "";
+function bytesToB64url(bytes) {
+  let bin = "";
   for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
-function buildBatch() {
-  const s = settings();
-  const unsent = records().filter(r => !r.sentAt).slice().reverse(); // 古い順に送る
-  const batch = [];
-  for (const r of unsent) {
-    const { sentAt, ...plain } = r;
-    batch.push(plain);
-    const enc = b64url(JSON.stringify({ v: 1, by: s.name, visits: batch }));
-    if (batch.length > MAX_PER_SEND || enc.length > MAX_URL_CHARS) { batch.pop(); break; }
-  }
-  if (!batch.length && unsent.length) { const { sentAt, ...plain } = unsent[0]; batch.push(plain); }
-  return batch;
-}
+const strToB64url = s => bytesToB64url(new TextEncoder().encode(s));
+async function blobToB64url(blob) { return bytesToB64url(new Uint8Array(await blob.arrayBuffer())); }
+
 function renderSend() {
   const n = records().filter(r => !r.sentAt).length;
-  $("#sendInfo").innerHTML = n ? "未送信の記録が <b>" + n + " 件</b> あります。" + (n > MAX_PER_SEND ? "（" + MAX_PER_SEND + "件ずつ送ります。数回くり返してください）" : "") : "未送信の記録はありません。";
+  $("#sendInfo").innerHTML = n ? "未送信の記録が <b>" + n + " 件</b> あります。" : "未送信の記録はありません。";
   $("#sendBtn").disabled = !n;
   const pend = load(K_PEND, null);
   $("#confirmBox").classList.toggle("hidden", !pend);
   if (pend) $("#confirmCode").textContent = pend.code;
+  const c = load(K_CUST, []), at = load(K_CUST + "_at", "");
+  $("#custInfo").textContent = c.length ? c.length + " 件・" + (at ? new Date(at).toLocaleDateString("ja-JP") + " 取り込み" : "") : "まだ取り込んでいません";
 }
-$("#sendBtn").onclick = () => {
+$("#sendBtn").onclick = async () => {
   const s = settings();
   if (!s.name) { toast("先に「設定」で担当者名を入れてください", true); showTab("set"); return; }
-  const host = (s.host || "").trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  const host = (s.host || "").trim().replace(/^https?:\/\//, "").replace(/[\/:].*$/, "");
   if (!host) { toast("「設定」でサーバーのアドレスを入れてください", true); showTab("set"); return; }
-  const batch = buildBatch(); if (!batch.length) return;
-  const ids = batch.map(r => r.id);
-  const code = codeOf(ids);
-  save(K_PEND, { ids, code, at: Date.now() });
-  const url = "http://" + host + (host.includes(":") ? "" : ":8790") + "/eigyo_uketori.html#d=" + b64url(JSON.stringify({ v: 1, by: s.name, visits: batch }));
-  renderSend();
-  const w = window.open(url, "_blank");
-  if (!w) location.href = url;
+  $("#sendBtn").disabled = true; $("#sendBtn").textContent = "準備中…";
+  try {
+    const unsent = records().filter(r => !r.sentAt).slice().reverse(); // 古い順に送る
+    const batch = [], files = []; let bytes = 0;
+    for (const r of unsent) {
+      const { sentAt, ...plain } = r;
+      const theirs = [];
+      for (const a of (r.attachments || [])) {
+        const f = await getFile(a.id);
+        if (f && f.blob) theirs.push({ id: a.id, data: await blobToB64url(f.blob) });
+      }
+      const add = theirs.reduce((t, f) => t + f.data.length, 0) + JSON.stringify(plain).length * 2;
+      if (batch.length && (batch.length >= MAX_PER_SEND || bytes + add > MAX_SEND_BYTES)) break;
+      batch.push(plain); files.push(...theirs); bytes += add;
+    }
+    if (!batch.length) return;
+    const ids = batch.map(r => r.id), code = codeOf(ids);
+    save(K_PEND, { ids, code, at: Date.now() });
+    // 送信フォームを作って送る（https のページから社内の http サーバーへ送れるのは、ページごと移る送信だけ）
+    const form = document.createElement("form");
+    form.method = "POST"; form.enctype = "text/plain"; form.acceptCharset = "UTF-8";
+    form.action = "http://" + host + ":8793/api/mobile/eigyo";
+    const field = (name, value) => { const t = document.createElement("textarea"); t.name = name; t.value = value; form.appendChild(t); };
+    field("d", strToB64url(JSON.stringify({ v: 2, by: s.name, visits: batch })));
+    files.forEach(f => field("f." + f.id, f.data));
+    form.style.display = "none"; document.body.appendChild(form);
+    form.submit();
+  } catch (e) {
+    toast("送信の準備に失敗しました", true);
+  } finally {
+    setTimeout(() => { $("#sendBtn").textContent = "送信する"; renderSend(); }, 1500);
+  }
 };
 $("#okSent").onclick = () => {
   const pend = load(K_PEND, null); if (!pend) return;
   const set = new Set(pend.ids), at = new Date().toISOString();
   const list = records().map(r => set.has(r.id) && !r.sentAt ? Object.assign({}, r, { sentAt: at }) : r);
   save(K_REC, list); localStorage.removeItem(K_PEND);
-  toast(pend.ids.length + " 件を送信済みにしました"); refreshHeader(); renderSend();
+  const left = list.filter(r => !r.sentAt).length;
+  toast(pend.ids.length + " 件を送信済みにしました" + (left ? "（残り " + left + " 件。もう一度送信してください）" : ""));
+  refreshHeader(); renderSend();
 };
 $("#ngSent").onclick = () => {
   localStorage.removeItem(K_PEND); renderSend();
   alert("送信できませんでした。\n・会社のWi-Fiにつながっているか\n・スティックPCが動いているか\nを確認して、もう一度「送信する」を押してください。\n（同じ記録を何回送っても、会社側で二重にはなりません）");
 };
-// 送信画面から戻ってきたら確認を出す
 document.addEventListener("visibilitychange", () => { if (!document.hidden && load(K_PEND, null)) showTab("send"); });
+
+function importCustomers(text) {
+  let d; try { d = JSON.parse(text); } catch (e) { return false; }
+  if (!d || d.t !== "miyabi-cust" || !Array.isArray(d.list)) return false;
+  const list = d.list.filter(c => c && c.name).map(c => ({ id: String(c.id || ""), name: String(c.name), address: String(c.address || "") }));
+  save(K_CUST, list); save(K_CUST + "_at", new Date().toISOString());
+  toast("顧客リストを " + list.length + " 件取り込みました"); renderSend(); return true;
+}
+$("#pasteCust").onclick = async () => {
+  let text = "";
+  try { if (navigator.clipboard && navigator.clipboard.readText) text = await navigator.clipboard.readText(); } catch (e) {}
+  if (text && importCustomers(text)) return;
+  text = prompt("コピーした顧客リストを、ここに貼り付けてください（長押し→ペースト）") || "";
+  if (text && !importCustomers(text)) toast("顧客リストではないようです。送信後の画面で「顧客リストをコピー」を押してください", true);
+};
 
 $("#exportBtn").onclick = async () => {
   const text = JSON.stringify({ app: "miyabi-mobile-visits", exportedAt: new Date().toISOString(), by: settings().name, visits: records() }, null, 1);
@@ -354,16 +588,17 @@ $("#exportBtn").onclick = async () => {
 };
 
 /* ---------- 設定 ---------- */
-function renderSet() { const s = settings(); $("#s-name").value = s.name; $("#s-host").value = s.host; $("#ver").textContent = "営業記録アプリ ver " + VERSION; }
+function renderSet() { const s = settings(); $("#s-name").value = s.name; $("#s-host").value = s.host; renderResultOpts(); $("#ver").textContent = "営業記録アプリ ver " + VERSION; }
 $("#saveSet").onclick = () => {
   const name = $("#s-name").value.trim(), host = $("#s-host").value.trim() || "192.168.11.56";
   if (!name) { toast("担当者名を入れてください", true); return; }
   save(K_SET, { name, host }); refreshHeader(); toast("設定を保存しました");
 };
-$("#purgeSent").onclick = () => {
-  const n = records().filter(r => r.sentAt).length;
-  if (!n) { toast("送信済みの記録はありません"); return; }
-  if (!confirm("送信済みの記録 " + n + " 件をiPhoneから消します。（会社に送った分は残ります）")) return;
+$("#purgeSent").onclick = async () => {
+  const sent = records().filter(r => r.sentAt);
+  if (!sent.length) { toast("送信済みの記録はありません"); return; }
+  if (!confirm("送信済みの記録 " + sent.length + " 件と、その写真をiPhoneから消します。（会社に送った分は残ります）")) return;
+  for (const r of sent) for (const a of (r.attachments || [])) { try { await delFile(a.id); } catch (e) {} }
   save(K_REC, records().filter(r => !r.sentAt)); refreshHeader(); toast("消しました");
 };
 
