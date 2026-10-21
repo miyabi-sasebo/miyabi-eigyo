@@ -78,14 +78,44 @@ textarea{min-height:90px;resize:vertical}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translateX(-50%);background:#1d2733;color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;max-width:90%}
 .toast.on{opacity:.95}.toast.err{background:var(--ng)}
 .hidden{display:none!important}
+/* 地図 */
+.mapcard{padding:0;overflow:hidden;position:relative;isolation:isolate}
+a.btn{text-decoration:none}
+.mapbox{position:relative;height:52vh;min-height:300px;background:#e4e8eb;touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden}
+.mapbox .layer{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 0}
+.mapbox img{position:absolute;width:256px;height:256px;pointer-events:none;-webkit-user-drag:none}
+.mpin{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.45)}
+.mpin.sel{width:30px;height:30px;margin:-15px 0 0 -15px;border-width:3px;z-index:3;box-shadow:0 0 0 4px rgba(31,78,121,.35)}
+.mlabel{position:absolute;transform:translate(-50%,11px);font-size:11px;font-weight:700;white-space:nowrap;color:#1d2733;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;pointer-events:none}
+.mme{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 7px rgba(26,115,232,.22);pointer-events:none;z-index:4}
+.mapctl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.mapctl button{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:20px;line-height:1;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15);padding:0}
+.attr{position:absolute;right:0;bottom:0;font-size:10px;color:#444;background:rgba(255,255,255,.75);padding:1px 5px;z-index:5}
+.offl{position:absolute;left:8px;top:8px;z-index:5;background:rgba(29,39,51,.85);color:#fff;font-size:12px;border-radius:8px;padding:5px 9px;max-width:70%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--sub);padding:10px 14px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:4px;vertical-align:-1px;flex:0 0 auto}
+.c-due{background:#d32f2f}.c-hot{background:#ef6c00}.c-stale{background:#e0a800}.c-never{background:#7e57c2}.c-recent{background:#2e7d32}.c-done{background:#9aa5b1}
+.mitem{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;padding:11px 0;color:var(--ink);font-size:15px;font-family:inherit}
+.mitem:first-child{border-top:0}
+.mitem .t{display:flex;align-items:center;gap:6px}.mitem .t b{flex:1;min-width:0}
+.mitem .km{font-size:13px;color:var(--sub);white-space:nowrap}
+.mitem .m{font-size:13px;color:var(--sub);margin-top:3px;padding-left:17px}
+.why{font-weight:700}.why.due{color:#c62828}.why.hot{color:#d35400}.why.stale{color:#9a7400}.why.never{color:#6a46b0}.why.recent{color:var(--ok)}
+.sel-card{background:#eef4fb;border:1px solid #c9dbef;border-radius:10px;padding:12px;margin-bottom:10px}
+.sel-card b{font-size:17px}
+.sel-card .m{font-size:13px;color:var(--sub);margin-top:4px;white-space:pre-wrap}
+.sel-card .acts{flex-wrap:wrap}
+.chips.small button{padding:6px 11px;font-size:14px}
+
 </style>
 </head>
 <body>
 <header><h1>営業記録</h1><span class="who" id="who"></span></header>
 <nav>
-  <button data-tab="add" class="on">記録する</button>
+  <button data-tab="add" class="on">記録</button>
+  <button data-tab="map">地図</button>
   <button data-tab="list">一覧<span class="badge hidden" id="unsentN"></span></button>
-  <button data-tab="send">会社へ送信</button>
+  <button data-tab="send">送信</button>
   <button data-tab="set">設定</button>
 </nav>
 <main>
@@ -141,6 +171,52 @@ textarea{min-height:90px;resize:vertical}
     <p class="note">保存した記録は、このiPhoneの中に残ります。電波がなくても保存できます。会社に戻ったら「会社へ送信」で送ってください。</p>
   </section>
 
+  <!-- 地図 -->
+  <section id="tab-map" class="hidden">
+    <div class="card mapcard">
+      <div class="mapbox" id="mapbox">
+        <div class="layer" id="mlayer"></div>
+        <div class="offl hidden" id="offl">電波なし：iPhoneに保存してある地図だけ表示しています</div>
+        <div class="mapctl">
+          <button type="button" id="zin" aria-label="拡大">＋</button>
+          <button type="button" id="zout" aria-label="縮小">－</button>
+          <button type="button" id="locate" aria-label="現在地">◎</button>
+        </div>
+        <div class="attr">地理院タイル</div>
+      </div>
+      <div class="legend">
+        <span><i class="dot c-due"></i>次回予定が近い・過ぎた</span>
+        <span><i class="dot c-hot"></i>見込み高・要フォロー</span>
+        <span><i class="dot c-stale"></i>30日以上行っていない</span>
+        <span><i class="dot c-never"></i>まだ行っていない</span>
+        <span><i class="dot c-recent"></i>最近行った</span>
+      </div>
+    </div>
+    <div class="card">
+      <div id="mapSel"></div>
+      <div class="seg" id="mapSort">
+        <button type="button" data-s="rec" class="on">おすすめ順</button>
+        <button type="button" data-s="near">近い順</button>
+      </div>
+      <div class="chips small" id="mapFilter" style="margin-top:10px">
+        <button type="button" data-f="all" class="on">すべて</button>
+        <button type="button" data-f="due">次回予定</button>
+        <button type="button" data-f="hot">見込み・フォロー</button>
+        <button type="button" data-f="stale">しばらく行っていない</button>
+        <button type="button" data-f="never">まだ行っていない</button>
+      </div>
+      <div id="mapList" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <div class="note" id="mapInfo"></div>
+      <button class="btn sub" id="getCust" type="button">会社から最新の顧客リストを受け取る（会社のWi-Fiで）</button>
+      <button class="btn sub" id="pasteCust2" type="button">コピーした顧客リストを取り込む</button>
+      <button class="btn sub hidden" id="geoBtn" type="button">住所から地図の位置を探す（電波が必要）</button>
+      <button class="btn sub" id="saveTiles" type="button">この辺りの地図をiPhoneに保存（電波のない所用）</button>
+      <div class="note" id="tileInfo" style="margin-top:6px"></div>
+    </div>
+  </section>
+
   <!-- 一覧 -->
   <section id="tab-list" class="hidden">
     <div class="card"><div id="list"></div></div>
@@ -167,7 +243,7 @@ textarea{min-height:90px;resize:vertical}
       <button class="btn accent" id="sendBtn" type="button">送信する</button>
     </div>
     <div class="card">
-      <div class="note"><b>会社の顧客リスト</b>（<span id="custInfo"></span>）<br>送信後の画面で「顧客リストをコピー」を押したあと、ここを押すと「既存のお客様」に出るようになります。</div>
+      <div class="note"><b>会社の顧客リスト</b>（<span id="custInfo"></span>）<br>送信後の画面で「顧客リストをコピー」を押したあと、ここを押すと「既存のお客様」と「地図」に出るようになります。</div>
       <button class="btn sub" id="pasteCust" type="button">コピーした顧客リストを取り込む</button>
     </div>
     <div class="card">
@@ -205,12 +281,14 @@ textarea{min-height:90px;resize:vertical}
 
 <script>
 "use strict";
-const VERSION = "2.0.0";
+const VERSION = "2.1.0";
 const K_REC = "miyabi_mobile_visits_v1";    // 記録
 const K_SET = "miyabi_mobile_settings_v1";  // 設定
 const K_PEND = "miyabi_mobile_pending_v1";  // 送信確認待ち
 const K_CUST = "miyabi_mobile_customers_v1"; // 会社の顧客リスト
 const K_RES = "miyabi_mobile_results_v1";   // 結果の選択肢
+const K_GEO = "miyabi_mobile_geo_v1";       // 住所から探した地図の位置
+const K_VIEW = "miyabi_mobile_mapview_v1";  // 地図の表示位置
 const DEFAULT_RESULTS = ["商談", "フォロー", "名刺交換", "見積提出", "不在", "失注", "受注"];
 const MAX_PER_SEND = 40;                 // 1回に送る記録の件数
 const MAX_SEND_BYTES = 18 * 1024 * 1024; // 1回に送るデータの大きさの目安（写真込み）
@@ -272,7 +350,9 @@ function shrinkImage(file) {
 /* ---------- 画面切り替え ---------- */
 function showTab(name) {
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
-  ["add", "list", "send", "set"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
+  ["add", "map", "list", "send", "set"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
+  if (name === "map") openMap();
+  if (name === "add" && custMode === "exist") renderCustList();
   if (name === "list") renderList();
   if (name === "send") renderSend();
   if (name === "set") renderSet();
@@ -564,17 +644,26 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && lo
 function importCustomers(text) {
   let d; try { d = JSON.parse(text); } catch (e) { return false; }
   if (!d || d.t !== "miyabi-cust" || !Array.isArray(d.list)) return false;
-  const list = d.list.filter(c => c && c.name).map(c => ({ id: String(c.id || ""), name: String(c.name), address: String(c.address || "") }));
+  const num = x => (typeof x === "number" && isFinite(x)) ? x : null;
+  const str = (x, n) => String(x == null ? "" : x).slice(0, n);
+  const list = d.list.filter(c => c && c.name).map(c => ({
+    id: str(c.id, 60), name: str(c.name, 200), address: str(c.address, 300), status: str(c.status, 20),
+    lat: num(c.lat), lng: num(c.lng), lastDate: str(c.lastDate, 10), lastResult: str(c.lastResult, 40), next: str(c.next, 200), nextDate: str(c.nextDate, 10)
+  }));
   save(K_CUST, list); save(K_CUST + "_at", new Date().toISOString());
-  toast("顧客リストを " + list.length + " 件取り込みました"); renderSend(); return true;
+  const pos = list.filter(c => c.lat != null).length;
+  toast("顧客リストを " + list.length + " 件取り込みました（地図に出せるのは " + pos + " 件）"); renderSend();
+  if (!$("#tab-map").classList.contains("hidden")) openMap();
+  return true;
 }
-$("#pasteCust").onclick = async () => {
+async function pasteCustomers() {
   let text = "";
   try { if (navigator.clipboard && navigator.clipboard.readText) text = await navigator.clipboard.readText(); } catch (e) {}
   if (text && importCustomers(text)) return;
   text = prompt("コピーした顧客リストを、ここに貼り付けてください（長押し→ペースト）") || "";
-  if (text && !importCustomers(text)) toast("顧客リストではないようです。送信後の画面で「顧客リストをコピー」を押してください", true);
-};
+  if (text && !importCustomers(text)) toast("顧客リストではないようです。会社の画面で「顧客リストをコピー」を押してください", true);
+}
+$("#pasteCust").onclick = pasteCustomers;
 
 $("#exportBtn").onclick = async () => {
   const text = JSON.stringify({ app: "miyabi-mobile-visits", exportedAt: new Date().toISOString(), by: settings().name, visits: records() }, null, 1);
@@ -585,6 +674,308 @@ $("#exportBtn").onclick = async () => {
   } catch (e) { if (e && e.name === "AbortError") return; }
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "application/json" })); a.download = name;
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+};
+
+/* ---------- 地図（次にどこへ行くか） ---------- */
+// 地図の絵は国土地理院の地図（地理院タイル）。見た所はiPhoneに保存され、電波がなくても出る
+const TILE_URL = (z, x, y) => "https://cyberjapandata.gsi.go.jp/xyz/std/" + z + "/" + x + "/" + y + ".png";
+const ZMIN = 6, ZMAX = 18, TILE_SAVE_MAX = 700;
+const CAT_RANK = { due: 0, hot: 1, stale: 2, never: 3, recent: 4, done: 5 };
+let mv = Object.assign({ lat: 33.1795, lng: 129.7155, z: 13 }, load(K_VIEW, {})); // 佐世保市付近
+let me = null, selKey = null, mapSort = "rec", mapFilter = "all", mapPins = [], mapItems = [];
+
+function wpx(lat, lng, z) {
+  const s = 256 * Math.pow(2, z), si = Math.sin(lat * Math.PI / 180);
+  return { x: (lng + 180) / 360 * s, y: (0.5 - Math.log((1 + si) / (1 - si)) / (4 * Math.PI)) * s };
+}
+function wll(x, y, z) {
+  const s = 256 * Math.pow(2, z), n = Math.PI - 2 * Math.PI * y / s;
+  return { lat: 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))), lng: x / s * 360 - 180 };
+}
+function kmBetween(a, b) {
+  const r = d => d * Math.PI / 180, dLat = r(b.lat - a.lat), dLng = r(b.lng - a.lng);
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+}
+function addDays(ymd, n) { const d = new Date(ymd + "T00:00:00"); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+function daysBetween(a, b) { return Math.round((Date.parse(b + "T00:00:00") - Date.parse(a + "T00:00:00")) / 864e5); }
+
+// 会社の顧客リスト ＋ このiPhoneの記録 をまとめて、お客様ごとに「最後に行った日・次回予定」を出す
+function mapCustomers() {
+  const out = [], byName = new Map(), byId = new Map(), geo = load(K_GEO, {});
+  load(K_CUST, []).forEach(c => {
+    if (!c || !c.name) return;
+    const o = {
+      key: "n:" + String(c.name).trim(), id: c.id || "", name: String(c.name).trim(), address: c.address || "", status: c.status || "",
+      lat: c.lat != null ? c.lat : null, lng: c.lng != null ? c.lng : null,
+      lastDate: c.lastDate || "", lastResult: c.lastResult || "", next: c.next || "", nextDate: c.nextDate || "", lastKey: c.lastDate || ""
+    };
+    if (byName.has(o.name)) return;
+    out.push(o); byName.set(o.name, o); if (o.id) byId.set(o.id, o);
+  });
+  records().slice().reverse().forEach(r => { // 古い順に見ていき、新しい記録で上書き
+    const n = (r.name || "").trim(); if (!n) return;
+    let o = (r.custId && byId.get(r.custId)) || byName.get(n);
+    if (!o) {
+      o = { key: "n:" + n, id: r.custId || "", name: n, address: r.address || "", status: r.custNew ? "要フォロー" : "", lat: null, lng: null, lastDate: "", lastResult: "", next: "", nextDate: "", lastKey: "" };
+      out.push(o); byName.set(n, o);
+    }
+    const k = (r.date || "") + (r.time || "");
+    if (k >= o.lastKey) { o.lastKey = k; o.lastDate = r.date || ""; o.lastResult = r.result || ""; o.next = r.next || ""; o.nextDate = r.nextDate || ""; }
+    if (o.lat == null && r.lat != null) { o.lat = r.lat; o.lng = r.lng; }
+  });
+  const td = today();
+  out.forEach(o => {
+    if (o.lat == null && geo[o.key]) { o.lat = geo[o.key].lat; o.lng = geo[o.key].lng; }
+    const days = o.lastDate ? daysBetween(o.lastDate, td) : null;
+    o.days = days;
+    if (o.status === "完了") { o.cat = "done"; o.why = "完了"; }
+    else if (o.nextDate && o.nextDate <= addDays(td, 3)) {
+      o.cat = "due"; const d = daysBetween(td, o.nextDate);
+      o.why = d < 0 ? "次回予定を " + (-d) + " 日過ぎています" : d === 0 ? "今日が次回予定日" : "次回予定まで あと " + d + " 日";
+    }
+    else if ((o.status === "見込み高" || o.status === "要フォロー") && (days == null || days >= 14)) { o.cat = "hot"; o.why = o.status + (days == null ? "・まだ訪問記録なし" : "・" + days + " 日行っていません"); }
+    else if (days == null) { o.cat = "never"; o.why = "まだ行っていません"; }
+    else if (days >= 30) { o.cat = "stale"; o.why = days + " 日行っていません"; }
+    else { o.cat = "recent"; o.why = days === 0 ? "今日行きました" : days + " 日前に行きました"; }
+    o.km = (me && o.lat != null) ? kmBetween(me, o) : null;
+  });
+  return out;
+}
+
+function mapSize() { const b = $("#mapbox"); return { w: b.clientWidth, h: b.clientHeight }; }
+function renderMap() {
+  const { w, h } = mapSize(); if (!w) return;
+  const z = mv.z, n = Math.pow(2, z), c = wpx(mv.lat, mv.lng, z), ox = c.x - w / 2, oy = c.y - h / 2;
+  let html = "";
+  for (let ty = Math.floor(oy / 256); ty <= Math.floor((oy + h) / 256); ty++) {
+    if (ty < 0 || ty >= n) continue;
+    for (let tx = Math.floor(ox / 256); tx <= Math.floor((ox + w) / 256); tx++) {
+      const x = ((tx % n) + n) % n;
+      html += '<img alt="" src="' + TILE_URL(z, x, ty) + '" style="left:' + Math.round(tx * 256 - ox) + 'px;top:' + Math.round(ty * 256 - oy) + 'px" onerror="this.style.visibility=\'hidden\'">';
+    }
+  }
+  mapPins = [];
+  const vis = mapItems.filter(o => o.lat != null && (mapFilter === "all" ? o.cat !== "done" : o.cat === mapFilter));
+  vis.sort((a, b) => CAT_RANK[b.cat] - CAT_RANK[a.cat]); // 大事なピンを上に重ねる
+  vis.forEach(o => {
+    const p = wpx(o.lat, o.lng, z), x = p.x - ox, y = p.y - oy;
+    if (x < -30 || y < -30 || x > w + 30 || y > h + 30) return;
+    mapPins.push({ o, x, y });
+  });
+  const showLabel = z >= 14 && mapPins.length <= 60;
+  mapPins.forEach(({ o, x, y }) => {
+    const sel = o.key === selKey;
+    html += '<div class="mpin c-' + o.cat + (sel ? " sel" : "") + '" style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px"></div>';
+    if (showLabel || sel) html += '<div class="mlabel" style="left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px">' + esc(o.name) + '</div>';
+  });
+  if (me) { const p = wpx(me.lat, me.lng, z); html += '<div class="mme" style="left:' + (p.x - ox).toFixed(1) + 'px;top:' + (p.y - oy).toFixed(1) + 'px"></div>'; }
+  const layer = $("#mlayer"); layer.style.transform = ""; layer.innerHTML = html;
+  $("#offl").classList.toggle("hidden", navigator.onLine !== false);
+  save(K_VIEW, { lat: +mv.lat.toFixed(6), lng: +mv.lng.toFixed(6), z: mv.z });
+}
+
+function renderMapList() {
+  let list = mapItems.filter(o => mapFilter === "all" ? o.cat !== "done" : o.cat === mapFilter);
+  if (mapSort === "near" && me) list.sort((a, b) => (a.km == null ? 1e9 : a.km) - (b.km == null ? 1e9 : b.km));
+  else list.sort((a, b) => CAT_RANK[a.cat] - CAT_RANK[b.cat]
+    || (a.cat === "due" ? a.nextDate.localeCompare(b.nextDate) : 0)
+    || ((a.km == null ? 1e9 : a.km) - (b.km == null ? 1e9 : b.km))
+    || ((b.days == null ? 1e6 : b.days) - (a.days == null ? 1e6 : a.days)));
+  const shown = list.slice(0, 40);
+  const head = mapSort === "near" && !me ? '<div class="note" style="margin:6px 0">近い順にするには、地図の ◎ で現在地を出してください。</div>' : "";
+  if (!list.length) {
+    $("#mapList").innerHTML = head + '<div class="empty">' + (mapItems.length ? "当てはまるお客様はいません" : "まだ顧客リストがありません。下の「会社から最新の顧客リストを受け取る」から取り込んでください。") + '</div>';
+    return;
+  }
+  $("#mapList").innerHTML = head + shown.map((o, i) =>
+    '<button type="button" class="mitem" data-k="' + esc(o.key) + '"><div class="t"><i class="dot c-' + o.cat + '"></i><b>' + esc(o.name) + '</b>'
+    + (o.km != null ? '<span class="km">' + (o.km < 10 ? o.km.toFixed(1) : Math.round(o.km)) + ' km</span>' : (o.lat == null ? '<span class="km">位置なし</span>' : '')) + '</div>'
+    + '<div class="m"><span class="why ' + o.cat + '">' + esc(o.why) + '</span>' + (o.next ? '　次：' + esc(o.next) : '') + '</div>'
+    + (o.lastDate ? '<div class="m">前回 ' + esc(o.lastDate) + (o.lastResult ? '（' + esc(o.lastResult) + '）' : '') + '</div>' : '')
+    + '</button>').join("")
+    + (list.length > shown.length ? '<div class="note" style="margin-top:6px">ほか ' + (list.length - shown.length) + ' 件</div>' : '');
+  $("#mapList").querySelectorAll("[data-k]").forEach(b => b.onclick = () => selectCust(b.dataset.k, true));
+}
+
+function renderMapSel() {
+  const o = mapItems.find(x => x.key === selKey);
+  if (!o) { $("#mapSel").innerHTML = ""; return; }
+  const route = o.lat != null ? '<a class="btn small sub" target="_blank" rel="noopener" href="https://maps.apple.com/?daddr=' + o.lat + ',' + o.lng + '&dirflg=d">🚗 道順（マップ）</a>' : "";
+  $("#mapSel").innerHTML = '<div class="sel-card"><div style="display:flex;gap:8px;align-items:center"><i class="dot c-' + o.cat + '"></i><b style="flex:1">' + esc(o.name) + '</b>'
+    + (o.status ? '<span class="tag res">' + esc(o.status) + '</span>' : '') + '</div>'
+    + (o.address ? '<div class="m">' + esc(o.address) + '</div>' : '')
+    + '<div class="m"><span class="why ' + o.cat + '">' + esc(o.why) + '</span></div>'
+    + (o.lastDate ? '<div class="m">前回 ' + esc(o.lastDate) + (o.lastResult ? '（' + esc(o.lastResult) + '）' : '') + '</div>' : '')
+    + (o.next || o.nextDate ? '<div class="m">次にやること：' + esc(o.next || "") + (o.nextDate ? '（' + esc(o.nextDate) + 'まで）' : '') + '</div>' : '')
+    + (o.lat == null ? '<div class="m">地図の位置がわかりません（住所から探すか、営業マップで位置を指定してください）</div>' : '')
+    + '<div class="acts"><button class="btn small" type="button" id="selRec">✏️ ここで記録する</button>' + route
+    + '<button class="btn small sub" type="button" id="selClose">閉じる</button></div></div>';
+  $("#selRec").onclick = () => {
+    clearForm(); showTab("add"); setMode("exist");
+    picked = { id: o.id || "", name: o.name, address: o.address || "" }; renderCustList();
+  };
+  $("#selClose").onclick = () => { selKey = null; renderMapSel(); renderMap(); };
+}
+function selectCust(key, center) {
+  selKey = key; const o = mapItems.find(x => x.key === key);
+  if (o && o.lat != null && center) { mv.lat = o.lat; mv.lng = o.lng; if (mv.z < 14) mv.z = 15; }
+  renderMap(); renderMapSel();
+  if (center) window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function renderMapInfo() {
+  const c = load(K_CUST, []), at = load(K_CUST + "_at", "");
+  const noPos = mapItems.filter(o => o.lat == null), canGeo = noPos.filter(o => o.address);
+  $("#mapInfo").innerHTML = "<b>顧客リスト</b>：" + (c.length ? c.length + " 件（" + (at ? new Date(at).toLocaleDateString("ja-JP") + " 取り込み" : "") + "）" : "まだ取り込んでいません")
+    + (noPos.length ? "<br>地図の位置がわからないお客様：" + noPos.length + " 件" : "")
+    + "<br>色や日数は、取り込んだ時点の会社の記録と、このiPhoneの記録から出しています。";
+  $("#geoBtn").classList.toggle("hidden", !canGeo.length);
+  $("#geoBtn").textContent = "住所から地図の位置を探す（" + canGeo.length + " 件・電波が必要）";
+}
+
+function openMap() {
+  mapItems = mapCustomers();
+  if (selKey && !mapItems.some(o => o.key === selKey)) selKey = null;
+  requestAnimationFrame(() => { renderMap(); renderMapList(); renderMapSel(); renderMapInfo(); });
+}
+function refreshMapData() { mapItems = mapCustomers(); renderMap(); renderMapList(); renderMapSel(); renderMapInfo(); }
+
+function zoomTo(z, ax, ay) { // ax,ay = 画面上の基準点（この点が動かないように拡大・縮小）
+  z = Math.max(ZMIN, Math.min(ZMAX, z)); if (z === mv.z) return;
+  const { w, h } = mapSize(); if (ax == null) { ax = w / 2; ay = h / 2; }
+  const c = wpx(mv.lat, mv.lng, mv.z), a = wll(c.x - w / 2 + ax, c.y - h / 2 + ay, mv.z);
+  const pa = wpx(a.lat, a.lng, z), nc = wll(pa.x - ax + w / 2, pa.y - ay + h / 2, z);
+  mv = { lat: nc.lat, lng: nc.lng, z }; renderMap();
+}
+$("#zin").onclick = () => zoomTo(mv.z + 1);
+$("#zout").onclick = () => zoomTo(mv.z - 1);
+$("#locate").onclick = () => locateMe(true);
+function locateMe(center) {
+  if (!navigator.geolocation) { toast("この端末では位置を取れません", true); return; }
+  toast("現在地を調べています…");
+  navigator.geolocation.getCurrentPosition(p => {
+    me = { lat: p.coords.latitude, lng: p.coords.longitude };
+    if (center) { mv.lat = me.lat; mv.lng = me.lng; if (mv.z < 13) mv.z = 14; }
+    refreshMapData(); toast("現在地を出しました");
+  }, () => toast("位置を取れませんでした（設定で位置情報を許可してください）", true), { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+}
+
+// 指でずらす・2本指で拡大縮小・ピンをタップ
+(function () {
+  const box = $("#mapbox"), layer = $("#mlayer"), pts = new Map();
+  let start = null, moved = false;
+  const rel = e => { const r = box.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  function snapshot() {
+    const a = Array.from(pts.values());
+    if (a.length >= 2) return { two: true, m: { x: (a[0].x + a[1].x) / 2, y: (a[0].y + a[1].y) / 2 }, d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) || 1 };
+    return { two: false, m: a[0], d: 1 };
+  }
+  function finish() {
+    if (!start) return;
+    const cur = snapshot(), { w, h } = mapSize();
+    const s = start.two ? Math.max(0.25, Math.min(4, cur.d / start.d)) : 1;
+    const dx = cur.m.x - start.m.x * s, dy = cur.m.y - start.m.y * s; // 画面 = 元の位置 × s + (dx,dy)
+    const c = wpx(mv.lat, mv.lng, mv.z), px = (w / 2 - dx) / s, py = (h / 2 - dy) / s; // 新しい中心は元の地図のどこか
+    const nc = wll(c.x - w / 2 + px, c.y - h / 2 + py, mv.z);
+    const dz = start.two ? Math.round(Math.log2(s)) : 0;
+    mv.lat = nc.lat; mv.lng = nc.lng; start = null;
+    if (dz) zoomTo(mv.z + dz); else renderMap();
+  }
+  box.addEventListener("pointerdown", e => {
+    if (e.target.closest(".mapctl")) return;
+    try { box.setPointerCapture(e.pointerId); } catch (err) {}
+    if (start) finish();
+    pts.set(e.pointerId, rel(e)); start = snapshot(); moved = false;
+  });
+  box.addEventListener("pointermove", e => {
+    if (!pts.has(e.pointerId) || !start) return;
+    pts.set(e.pointerId, rel(e));
+    const cur = snapshot();
+    if (start.two !== cur.two) return;
+    const s = start.two ? Math.max(0.25, Math.min(4, cur.d / start.d)) : 1;
+    const dx = cur.m.x - start.m.x * s, dy = cur.m.y - start.m.y * s;
+    if (Math.abs(cur.m.x - start.m.x) + Math.abs(cur.m.y - start.m.y) > 6 || start.two) moved = true;
+    layer.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + s + ")";
+  });
+  const up = e => {
+    if (!pts.has(e.pointerId)) return;
+    const wasTap = !moved && start && !start.two, p = pts.get(e.pointerId);
+    if (pts.size >= 2 || moved) finish();
+    pts.delete(e.pointerId);
+    if (pts.size) { start = snapshot(); moved = true; return; }
+    start = null; layer.style.transform = "";
+    if (wasTap) {
+      let best = null, bd = 26;
+      mapPins.forEach(q => { const d = Math.hypot(q.x - p.x, q.y - p.y); if (d < bd) { bd = d; best = q; } });
+      if (best) selectCust(best.o.key, false);
+    }
+  };
+  box.addEventListener("pointerup", up); box.addEventListener("pointercancel", up);
+  box.addEventListener("wheel", e => { e.preventDefault(); const p = rel(e); zoomTo(mv.z + (e.deltaY < 0 ? 1 : -1), p.x, p.y); }, { passive: false });
+  window.addEventListener("resize", () => { if (!$("#tab-map").classList.contains("hidden")) renderMap(); });
+  window.addEventListener("online", () => { if (!$("#tab-map").classList.contains("hidden")) renderMap(); });
+  window.addEventListener("offline", () => { if (!$("#tab-map").classList.contains("hidden")) renderMap(); });
+})();
+
+document.querySelectorAll("#mapSort button").forEach(b => b.onclick = () => {
+  mapSort = b.dataset.s; document.querySelectorAll("#mapSort button").forEach(x => x.classList.toggle("on", x === b));
+  if (mapSort === "near" && !me) locateMe(false);
+  renderMapList();
+});
+document.querySelectorAll("#mapFilter button").forEach(b => b.onclick = () => {
+  mapFilter = b.dataset.f; document.querySelectorAll("#mapFilter button").forEach(x => x.classList.toggle("on", x === b));
+  renderMap(); renderMapList();
+});
+
+$("#getCust").onclick = () => {
+  const host = (settings().host || "").trim().replace(/^https?:\/\//, "").replace(/[\/:].*$/, "");
+  if (!host) { toast("「設定」でサーバーのアドレスを入れてください", true); showTab("set"); return; }
+  alert("会社の画面が開きます。\n「顧客リストをコピー」を押してから、左上の「完了」で閉じて、\nこの画面の「コピーした顧客リストを取り込む」を押してください。");
+  location.href = "http://" + host + ":8793/api/mobile/customers";
+};
+$("#pasteCust2").onclick = pasteCustomers;
+
+// 住所から位置を探す（国土地理院の住所検索。位置はこのiPhoneにだけ保存）
+$("#geoBtn").onclick = async () => {
+  const todo = mapItems.filter(o => o.lat == null && o.address);
+  if (!todo.length) return;
+  if (navigator.onLine === false) { toast("電波のある所で押してください", true); return; }
+  const btn = $("#geoBtn"); btn.disabled = true;
+  const geo = load(K_GEO, {}); let ok = 0;
+  for (let i = 0; i < todo.length; i++) {
+    btn.textContent = "探しています… " + (i + 1) + " / " + todo.length;
+    try {
+      const r = await fetch("https://msearch.gsi.go.jp/address-search/AddressSearch?q=" + encodeURIComponent(todo[i].address));
+      const j = await r.json();
+      const g = j && j[0] && j[0].geometry && j[0].geometry.coordinates;
+      if (g && isFinite(+g[0]) && isFinite(+g[1])) { geo[todo[i].key] = { lat: +g[1], lng: +g[0] }; ok++; save(K_GEO, geo); }
+    } catch (e) {}
+    await new Promise(res => setTimeout(res, 250));
+  }
+  btn.disabled = false; refreshMapData();
+  toast(ok + " 件の位置がわかりました" + (ok < todo.length ? "（" + (todo.length - ok) + " 件は見つかりませんでした）" : ""));
+};
+
+// いま見ている範囲の地図を、少し広め・少し詳しめまでまとめて保存
+$("#saveTiles").onclick = async () => {
+  if (navigator.onLine === false) { toast("電波のある所で押してください", true); return; }
+  const { w, h } = mapSize(); const c = wpx(mv.lat, mv.lng, mv.z);
+  const nw = wll(c.x - w, c.y - h, mv.z), se = wll(c.x + w, c.y + h, mv.z); // 画面の3倍くらいの広さ
+  const urls = [];
+  for (let z = Math.max(ZMIN, mv.z - 3); z <= Math.min(ZMAX, mv.z + 2); z++) {
+    const a = wpx(nw.lat, nw.lng, z), b = wpx(se.lat, se.lng, z);
+    for (let x = Math.floor(a.x / 256); x <= Math.floor(b.x / 256); x++) for (let y = Math.floor(a.y / 256); y <= Math.floor(b.y / 256); y++) urls.push(TILE_URL(z, x, y));
+  }
+  if (urls.length > TILE_SAVE_MAX) { toast("範囲が広すぎます。もう少し拡大してから押してください", true); return; }
+  if (!confirm("この辺りの地図（" + urls.length + " 枚・約 " + Math.max(1, Math.round(urls.length * 0.025)) + "MB）をiPhoneに保存します。Wi-Fiのときがおすすめです。")) return;
+  const btn = $("#saveTiles"); btn.disabled = true; let done = 0, ok = 0;
+  const one = u => new Promise(res => { const im = new Image(); im.onload = () => { ok++; res(); }; im.onerror = () => res(); im.src = u; });
+  const queue = urls.slice();
+  await Promise.all([0, 1, 2, 3].map(async () => { while (queue.length) { await one(queue.shift()); done++; btn.textContent = "保存中… " + done + " / " + urls.length; } }));
+  btn.disabled = false; btn.textContent = "この辺りの地図をiPhoneに保存（電波のない所用）";
+  $("#tileInfo").textContent = new Date().toLocaleString("ja-JP") + "：" + ok + " 枚を保存しました。";
+  toast("地図を保存しました");
 };
 
 /* ---------- 設定 ---------- */
