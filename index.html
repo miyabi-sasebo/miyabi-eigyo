@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="営業記録">
+<meta name="theme-color" content="#1f4e79">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>営業記録</title>
+<style>
+:root{--bg:#f3f5f8;--card:#fff;--ink:#1d2733;--sub:#5d6b7a;--line:#d9e0e8;--main:#1f4e79;--accent:#e85d04;--ok:#2e7d32;--warn:#b26a00;--ng:#c62828}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;font-size:16px;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:5;background:var(--main);color:#fff;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;margin:0;flex:1}
+header .who{font-size:13px;opacity:.85}
+nav{display:flex;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:calc(env(safe-area-inset-top) + 46px);z-index:4}
+nav button{flex:1;border:0;background:none;padding:12px 4px;font-size:15px;color:var(--sub);border-bottom:3px solid transparent}
+nav button.on{color:var(--main);font-weight:700;border-bottom-color:var(--main)}
+nav .badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:10px;background:var(--accent);color:#fff;font-size:12px;margin-left:4px}
+main{padding:14px 16px calc(env(safe-area-inset-bottom) + 30px);max-width:640px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--sub);margin:10px 0 4px}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;font-size:16px;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-family:inherit}
+textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.btn{display:block;width:100%;border:0;border-radius:10px;padding:14px;font-size:16px;font-weight:700;background:var(--main);color:#fff;margin-top:14px}
+.btn.sub{background:#e8eef5;color:var(--main)}
+.btn.accent{background:var(--accent)}
+.btn.small{display:inline-block;width:auto;padding:8px 12px;font-size:14px;margin:0}
+.btn.danger{background:#fdecec;color:var(--ng)}
+.btn:disabled{opacity:.5}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:8px 14px;font-size:15px;color:var(--ink)}
+.chips button.on{background:var(--main);border-color:var(--main);color:#fff}
+.pos{font-size:13px;color:var(--sub);margin-top:6px}
+.item{border-top:1px solid var(--line);padding:12px 0}
+.item:first-child{border-top:0;padding-top:0}
+.item b{font-size:16px}
+.item .m{font-size:13px;color:var(--sub);margin-top:3px;white-space:pre-wrap;word-break:break-word}
+.tag{display:inline-block;font-size:12px;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+.tag.res{background:#e8eef5;color:var(--main)}
+.tag.unsent{background:#fff1e0;color:var(--warn)}
+.tag.sent{background:#e6f4e7;color:var(--ok)}
+.acts{margin-top:8px;display:flex;gap:8px}
+.note{font-size:14px;color:var(--sub);line-height:1.6}
+.note b{color:var(--ink)}
+.banner{background:#fff8e1;border:1px solid #f0d58a;border-radius:10px;padding:12px;font-size:14px;line-height:1.6;margin-bottom:12px}
+.big{font-size:34px;font-weight:800;letter-spacing:4px;text-align:center;color:var(--main);margin:8px 0}
+.empty{color:var(--sub);text-align:center;padding:20px 0;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 24px);transform:translateX(-50%);background:#1d2733;color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20;max-width:90%}
+.toast.on{opacity:.95}.toast.err{background:var(--ng)}
+dialog{border:0;border-radius:14px;padding:18px;max-width:420px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header><h1>営業記録</h1><span class="who" id="who"></span></header>
+<nav>
+  <button data-tab="add" class="on">記録する</button>
+  <button data-tab="list">一覧<span class="badge hidden" id="unsentN"></span></button>
+  <button data-tab="send">会社へ送信</button>
+  <button data-tab="set">設定</button>
+</nav>
+<main>
+  <div class="banner hidden" id="a2hs">このアプリは<b>ホーム画面に追加</b>してから使ってください。<br>Safari下の共有ボタン（□↑）→「ホーム画面に追加」。ホーム画面から開くと、電波のない場所でも開けて、記録も消えにくくなります。</div>
+  <div class="banner hidden" id="needName">最初に「設定」で<b>担当者名</b>を入れてください。</div>
+
+  <!-- 記録する -->
+  <section id="tab-add">
+    <div class="card">
+      <input type="hidden" id="f-id">
+      <div class="row">
+        <div><label for="f-date">訪問日</label><input type="date" id="f-date"></div>
+        <div><label for="f-time">時刻</label><input type="time" id="f-time"></div>
+      </div>
+      <label for="f-name">訪問先（会社名・お名前）</label>
+      <input id="f-name" list="nameList" autocomplete="off" placeholder="例：〇〇建設 △△様">
+      <datalist id="nameList"></datalist>
+      <label>結果</label>
+      <div class="chips" id="f-result"></div>
+      <label for="f-memo">内容・メモ</label>
+      <textarea id="f-memo" placeholder="話した内容、要望、金額の目安など"></textarea>
+      <div class="row">
+        <div><label for="f-next">次にやること</label><input id="f-next" placeholder="見積を送る など"></div>
+        <div><label for="f-nextdate">期限</label><input type="date" id="f-nextdate"></div>
+      </div>
+      <label for="f-address">場所・住所（任意）</label>
+      <input id="f-address" placeholder="佐世保市〇〇町">
+      <button class="btn sub" id="gpsBtn" type="button">📍 現在地を記録</button>
+      <div class="pos" id="f-pos">位置：未記録</div>
+      <button class="btn accent" id="saveBtn" type="button">保存する（iPhoneに保存）</button>
+      <button class="btn sub hidden" id="cancelEdit" type="button">編集をやめる</button>
+    </div>
+    <p class="note">保存した記録は、このiPhoneの中に残ります。電波がなくても保存できます。会社に戻ったら「会社へ送信」で送ってください。</p>
+  </section>
+
+  <!-- 一覧 -->
+  <section id="tab-list" class="hidden">
+    <div class="card"><div id="list"></div></div>
+  </section>
+
+  <!-- 会社へ送信 -->
+  <section id="tab-send" class="hidden">
+    <div class="card">
+      <div class="note" id="sendInfo"></div>
+      <ol class="note" style="padding-left:20px;margin:10px 0 0">
+        <li>iPhoneを<b>会社のWi-Fi</b>につなぐ</li>
+        <li>下の「送信する」を押す</li>
+        <li>開いた画面に「受け取りました」と<b>4けたの番号</b>が出たら、左上の「完了」で閉じる</li>
+        <li>この画面に戻り、番号が同じなら「送信できた」を押す</li>
+      </ol>
+      <button class="btn accent" id="sendBtn" type="button">送信する</button>
+    </div>
+    <div class="card hidden" id="confirmBox">
+      <div class="note">送信した画面に出た番号は、これと同じでしたか？</div>
+      <div class="big" id="confirmCode"></div>
+      <div class="row">
+        <button class="btn" id="okSent" type="button">同じ（送信できた）</button>
+        <button class="btn sub" id="ngSent" type="button">出なかった</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="note"><b>万一のための控え</b><br>iPhoneの機種変更の前などに、記録をファイルで保存できます。</div>
+      <button class="btn sub" id="exportBtn" type="button">記録をファイルに書き出す</button>
+    </div>
+  </section>
+
+  <!-- 設定 -->
+  <section id="tab-set" class="hidden">
+    <div class="card">
+      <label for="s-name">担当者名</label>
+      <input id="s-name" placeholder="例：佐藤">
+      <label for="s-host">会社のサーバー（スティックPC）のアドレス</label>
+      <input id="s-host" inputmode="url" autocapitalize="off" autocorrect="off" placeholder="192.168.11.56">
+      <button class="btn" id="saveSet" type="button">設定を保存</button>
+    </div>
+    <div class="card">
+      <div class="note">送信済みの記録は、iPhoneの中に残しておけます。容量が気になるときだけ消してください。</div>
+      <button class="btn danger" id="purgeSent" type="button">送信済みの記録をiPhoneから消す</button>
+    </div>
+    <p class="note" id="ver"></p>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const VERSION = "1.0.0";
+const K_REC = "miyabi_mobile_visits_v1";   // 記録
+const K_SET = "miyabi_mobile_settings_v1"; // 設定
+const K_PEND = "miyabi_mobile_pending_v1"; // 送信確認待ち
+const RESULTS = ["商談", "フォロー", "名刺交換", "不在", "失注", "受注"];
+const MAX_PER_SEND = 40;        // 1回に送る件数
+const MAX_URL_CHARS = 60000;    // 1回に送るデータの大きさの上限
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function load(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { toast("保存できませんでした（容量不足の可能性）", true); return false; } }
+function pad(n) { return String(n).padStart(2, "0"); }
+function today() { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+function nowTime() { const d = new Date(); return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+function uid() { return "m-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+let toastTimer = null;
+function toast(m, err) { const t = $("#toast"); t.textContent = m; t.className = "toast on" + (err ? " err" : ""); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = "toast", err ? 3500 : 2000); }
+
+const settings = () => Object.assign({ name: "", host: "192.168.11.56" }, load(K_SET, {}));
+const records = () => load(K_REC, []);
+let curPos = null, curResult = RESULTS[0];
+
+/* ---------- 画面切り替え ---------- */
+function showTab(name) {
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+  ["add", "list", "send", "set"].forEach(t => $("#tab-" + t).classList.toggle("hidden", t !== name));
+  if (name === "list") renderList();
+  if (name === "send") renderSend();
+  if (name === "set") renderSet();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+
+function refreshHeader() {
+  const s = settings();
+  $("#who").textContent = s.name ? s.name + " さん" : "";
+  $("#needName").classList.toggle("hidden", !!s.name);
+  const n = records().filter(r => !r.sentAt).length;
+  $("#unsentN").textContent = n; $("#unsentN").classList.toggle("hidden", !n);
+  const names = Array.from(new Set(records().map(r => r.name).filter(Boolean))).slice(0, 200);
+  $("#nameList").innerHTML = names.map(n => '<option value="' + esc(n) + '">').join("");
+}
+
+/* ---------- 記録する ---------- */
+function renderChips() {
+  $("#f-result").innerHTML = RESULTS.map(r => '<button type="button" class="' + (r === curResult ? "on" : "") + '" data-r="' + esc(r) + '">' + esc(r) + '</button>').join("");
+  $("#f-result").querySelectorAll("button").forEach(b => b.onclick = () => { curResult = b.dataset.r; renderChips(); });
+}
+function clearForm() {
+  $("#f-id").value = ""; $("#f-date").value = today(); $("#f-time").value = nowTime();
+  ["#f-name", "#f-memo", "#f-next", "#f-nextdate", "#f-address"].forEach(s => $(s).value = "");
+  curResult = RESULTS[0]; curPos = null; renderChips(); showPos();
+  $("#saveBtn").textContent = "保存する（iPhoneに保存）"; $("#cancelEdit").classList.add("hidden");
+}
+function showPos() { $("#f-pos").textContent = curPos ? "位置：記録済み（" + curPos.lat.toFixed(5) + ", " + curPos.lng.toFixed(5) + "）" : "位置：未記録"; }
+$("#gpsBtn").onclick = () => {
+  if (!navigator.geolocation) { toast("この端末では位置を取れません", true); return; }
+  $("#f-pos").textContent = "位置を取得中…";
+  navigator.geolocation.getCurrentPosition(
+    p => { curPos = { lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6) }; showPos(); toast("現在地を記録しました"); },
+    () => { showPos(); toast("位置を取れませんでした（設定で位置情報を許可してください）", true); },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+};
+$("#saveBtn").onclick = () => {
+  const s = settings();
+  const name = $("#f-name").value.trim();
+  if (!name) { toast("訪問先を入れてください", true); $("#f-name").focus(); return; }
+  const list = records();
+  const id = $("#f-id").value;
+  const old = id ? list.find(r => r.id === id) : null;
+  const rec = {
+    id: id || uid(),
+    date: $("#f-date").value || today(),
+    time: $("#f-time").value || "",
+    name,
+    result: curResult,
+    memo: $("#f-memo").value.trim(),
+    next: $("#f-next").value.trim(),
+    nextDate: $("#f-nextdate").value,
+    address: $("#f-address").value.trim(),
+    lat: curPos ? curPos.lat : (old ? old.lat : null),
+    lng: curPos ? curPos.lng : (old ? old.lng : null),
+    by: s.name || "",
+    src: "iphone",
+    ts: old ? old.ts : new Date().toLocaleString("ja-JP"),
+    updatedAt: new Date().toISOString(),
+    sentAt: null   // 直したら、もう一度送る
+  };
+  if (old) list[list.indexOf(old)] = rec; else list.unshift(rec);
+  list.sort((a, b) => (b.date + (b.time || "")).localeCompare(a.date + (a.time || "")));
+  if (!save(K_REC, list)) return;
+  toast(old ? "直しました（未送信に戻りました）" : "保存しました");
+  clearForm(); refreshHeader();
+};
+$("#cancelEdit").onclick = clearForm;
+
+function editRecord(id) {
+  const r = records().find(x => x.id === id); if (!r) return;
+  showTab("add");
+  $("#f-id").value = r.id; $("#f-date").value = r.date || ""; $("#f-time").value = r.time || "";
+  $("#f-name").value = r.name || ""; $("#f-memo").value = r.memo || ""; $("#f-next").value = r.next || "";
+  $("#f-nextdate").value = r.nextDate || ""; $("#f-address").value = r.address || "";
+  curResult = RESULTS.includes(r.result) ? r.result : RESULTS[0]; renderChips();
+  curPos = r.lat != null ? { lat: r.lat, lng: r.lng } : null; showPos();
+  $("#saveBtn").textContent = "直して保存"; $("#cancelEdit").classList.remove("hidden");
+}
+
+/* ---------- 一覧 ---------- */
+function renderList() {
+  const list = records();
+  if (!list.length) { $("#list").innerHTML = '<div class="empty">まだ記録がありません</div>'; return; }
+  $("#list").innerHTML = list.map(r =>
+    '<div class="item"><b>' + esc(r.name) + '</b><span class="tag res">' + esc(r.result) + '</span>'
+    + (r.sentAt ? '<span class="tag sent">送信済み</span>' : '<span class="tag unsent">未送信</span>')
+    + '<div class="m">' + esc(r.date) + (r.time ? " " + esc(r.time) : "") + (r.address ? "　" + esc(r.address) : "") + (r.lat != null ? "　📍" : "") + '</div>'
+    + (r.memo ? '<div class="m">' + esc(r.memo) + '</div>' : '')
+    + (r.next ? '<div class="m">次：' + esc(r.next) + (r.nextDate ? "（" + esc(r.nextDate) + "まで）" : "") + '</div>' : '')
+    + '<div class="acts"><button class="btn small sub" data-edit="' + esc(r.id) + '">直す</button>'
+    + '<button class="btn small danger" data-del="' + esc(r.id) + '">消す</button></div></div>').join("");
+  $("#list").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => editRecord(b.dataset.edit));
+  $("#list").querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+    const r = records().find(x => x.id === b.dataset.del); if (!r) return;
+    const msg = r.sentAt ? "この記録をiPhoneから消しますか？（会社に送った分は残ります）" : "まだ会社に送っていない記録です。本当に消しますか？";
+    if (!confirm(msg)) return;
+    save(K_REC, records().filter(x => x.id !== r.id)); renderList(); refreshHeader(); toast("消しました");
+  });
+}
+
+/* ---------- 会社へ送信 ---------- */
+// 送る記録のまとまりから4けたの確認番号を作る（受け取り側も同じ計算をする）
+function codeOf(ids) {
+  let h = 0; const s = ids.slice().sort().join(",");
+  for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+  return String(h % 10000).padStart(4, "0");
+}
+function b64url(str) {
+  const bytes = new TextEncoder().encode(str); let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function buildBatch() {
+  const s = settings();
+  const unsent = records().filter(r => !r.sentAt).slice().reverse(); // 古い順に送る
+  const batch = [];
+  for (const r of unsent) {
+    const { sentAt, ...plain } = r;
+    batch.push(plain);
+    const enc = b64url(JSON.stringify({ v: 1, by: s.name, visits: batch }));
+    if (batch.length > MAX_PER_SEND || enc.length > MAX_URL_CHARS) { batch.pop(); break; }
+  }
+  if (!batch.length && unsent.length) { const { sentAt, ...plain } = unsent[0]; batch.push(plain); }
+  return batch;
+}
+function renderSend() {
+  const n = records().filter(r => !r.sentAt).length;
+  $("#sendInfo").innerHTML = n ? "未送信の記録が <b>" + n + " 件</b> あります。" + (n > MAX_PER_SEND ? "（" + MAX_PER_SEND + "件ずつ送ります。数回くり返してください）" : "") : "未送信の記録はありません。";
+  $("#sendBtn").disabled = !n;
+  const pend = load(K_PEND, null);
+  $("#confirmBox").classList.toggle("hidden", !pend);
+  if (pend) $("#confirmCode").textContent = pend.code;
+}
+$("#sendBtn").onclick = () => {
+  const s = settings();
+  if (!s.name) { toast("先に「設定」で担当者名を入れてください", true); showTab("set"); return; }
+  const host = (s.host || "").trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  if (!host) { toast("「設定」でサーバーのアドレスを入れてください", true); showTab("set"); return; }
+  const batch = buildBatch(); if (!batch.length) return;
+  const ids = batch.map(r => r.id);
+  const code = codeOf(ids);
+  save(K_PEND, { ids, code, at: Date.now() });
+  const url = "http://" + host + (host.includes(":") ? "" : ":8790") + "/eigyo_uketori.html#d=" + b64url(JSON.stringify({ v: 1, by: s.name, visits: batch }));
+  renderSend();
+  const w = window.open(url, "_blank");
+  if (!w) location.href = url;
+};
+$("#okSent").onclick = () => {
+  const pend = load(K_PEND, null); if (!pend) return;
+  const set = new Set(pend.ids), at = new Date().toISOString();
+  const list = records().map(r => set.has(r.id) && !r.sentAt ? Object.assign({}, r, { sentAt: at }) : r);
+  save(K_REC, list); localStorage.removeItem(K_PEND);
+  toast(pend.ids.length + " 件を送信済みにしました"); refreshHeader(); renderSend();
+};
+$("#ngSent").onclick = () => {
+  localStorage.removeItem(K_PEND); renderSend();
+  alert("送信できませんでした。\n・会社のWi-Fiにつながっているか\n・スティックPCが動いているか\nを確認して、もう一度「送信する」を押してください。\n（同じ記録を何回送っても、会社側で二重にはなりません）");
+};
+// 送信画面から戻ってきたら確認を出す
+document.addEventListener("visibilitychange", () => { if (!document.hidden && load(K_PEND, null)) showTab("send"); });
+
+$("#exportBtn").onclick = async () => {
+  const text = JSON.stringify({ app: "miyabi-mobile-visits", exportedAt: new Date().toISOString(), by: settings().name, visits: records() }, null, 1);
+  const name = "営業記録_" + today().replace(/-/g, "") + ".json";
+  try {
+    const file = new File([text], name, { type: "application/json" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "application/json" })); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+};
+
+/* ---------- 設定 ---------- */
+function renderSet() { const s = settings(); $("#s-name").value = s.name; $("#s-host").value = s.host; $("#ver").textContent = "営業記録アプリ ver " + VERSION; }
+$("#saveSet").onclick = () => {
+  const name = $("#s-name").value.trim(), host = $("#s-host").value.trim() || "192.168.11.56";
+  if (!name) { toast("担当者名を入れてください", true); return; }
+  save(K_SET, { name, host }); refreshHeader(); toast("設定を保存しました");
+};
+$("#purgeSent").onclick = () => {
+  const n = records().filter(r => r.sentAt).length;
+  if (!n) { toast("送信済みの記録はありません"); return; }
+  if (!confirm("送信済みの記録 " + n + " 件をiPhoneから消します。（会社に送った分は残ります）")) return;
+  save(K_REC, records().filter(r => !r.sentAt)); refreshHeader(); toast("消しました");
+};
+
+/* ---------- 起動 ---------- */
+const standalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+$("#a2hs").classList.toggle("hidden", standalone || !isIOS);
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+clearForm(); refreshHeader();
+if (load(K_PEND, null)) showTab("send");
+</script>
+</body>
+</html>
